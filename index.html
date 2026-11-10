@@ -57,6 +57,18 @@ main{
 #cal:hover,#crewBtn:hover{border-color:var(--ink)}
 #crewBtn{font-family:var(--body);font-weight:600;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:transparent;border:1.5px solid rgba(246,234,242,.5);border-radius:999px;padding:7.5px 18px;cursor:pointer}
 #crewCount{color:var(--sea)}
+/* crew box: the one loud element in the panel */
+.crewbox{width:100%;box-sizing:border-box;margin-top:10px;padding:14px;border-radius:16px;border:1.5px solid var(--neon);background:linear-gradient(160deg,rgba(255,95,168,.18),rgba(79,224,208,.07));box-shadow:0 0 28px rgba(255,95,168,.35),inset 0 0 20px rgba(255,95,168,.08);display:flex;flex-direction:column;gap:10px;text-align:left}
+.cb-title{margin:0;font-family:var(--display);font-weight:400;font-size:1.7rem;line-height:1;letter-spacing:.03em;text-transform:uppercase;color:var(--neon)}
+.cb-title #crewCount{color:var(--neon)}
+.crewbox #crewJoin{color:#1a0f2e;background:linear-gradient(90deg,var(--sea),var(--neon));box-shadow:0 0 18px rgba(255,95,168,.5)}
+.crewbox #psn{background:rgba(255,255,255,.07);border-color:rgba(246,234,242,.3)}
+.cb-chips{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.cb-chips:empty{display:none}
+.cb-chips li{font-family:var(--body);font-weight:600;font-size:.85rem;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--ink);max-width:100%;overflow-wrap:anywhere}
+.cb-chips li.me{background:var(--neon);color:#1a0f2e}
+.cb-chips li.empty{background:transparent;color:var(--muted);padding-left:0}
+.cb-chips button{min-height:32px;font:inherit;font-weight:600;font-size:.85rem;color:var(--sea);background:transparent;border:0;text-decoration:underline;cursor:pointer;padding:0 6px}
 /* one size for every control: 44px tall pills, primary = gradient, secondary = outline */
 .actions #copy,.actions #crewBtn,.actions #cal{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;font-size:.85rem;white-space:nowrap}
 body .scene-tag button{min-height:44px;padding:0 18px;font-size:.8rem}
@@ -85,7 +97,8 @@ body #crewClose{min-width:44px;min-height:44px;border-radius:999px;border:1.5px 
 .crew-list em{font-style:normal;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#1a0f2e;background:var(--neon);border-radius:999px;padding:2px 8px}
 .crew-list li button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.8rem;text-decoration:underline;cursor:pointer;padding:2px 4px}
 #cal:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-#copy{font-family:var(--body);font-weight:600;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;color:#1a0f2e;background:linear-gradient(90deg,var(--sea),var(--neon));border:0;border-radius:999px;padding:9px 20px;cursor:pointer}
+#copy{font-family:var(--body);font-weight:600;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:transparent;border:1.5px solid rgba(246,234,242,.5);border-radius:999px;padding:9px 20px;cursor:pointer}
+#copy:hover{border-color:var(--ink)}
 .scene-tag{
   position:fixed;z-index:2;
   left:max(16px,env(safe-area-inset-left,0px));
@@ -139,10 +152,16 @@ main,.scene-tag{transition:opacity .8s ease}
   <div class="target">Nov 19 · 00:00 Israel time</div>
   <button id="playSound" type="button" hidden>▶ Turn it up</button>
   <div class="preload" id="preload"><span class="pl-line" id="plLine"></span><span class="pl-info" id="plInfo"></span></div>
+  <section class="crewbox" id="crewBox" aria-labelledby="crewBoxTitle">
+    <h2 class="cb-title" id="crewBoxTitle">The crew <span id="crewCount"></span></h2>
+    <p class="crew-sub">Drop your PSN username. Everyone who opens this page sees the full list.</p>
+    <form id="crewForm" novalidate><input id="psn" maxlength="16" autocomplete="off" spellcheck="false" placeholder="PSN username" aria-label="PSN username"><button type="submit" id="crewJoin">I'm in</button></form>
+    <p class="crew-msg" id="crewMsg" role="status"></p>
+    <ul class="cb-chips" id="crewChips"></ul>
+  </section>
   <div class="actions">
-    <button id="copy" type="button">Copy link to share</button>
     <div class="row">
-    <button id="crewBtn" type="button">The crew <span id="crewCount"></span></button>
+    <button id="copy" type="button">Copy link to share</button>
     <a id="cal" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=GTA%206%20launch&amp;dates=20261118T220000Z/20261118T230000Z&amp;ctz=Asia/Jerusalem&amp;details=GTA%206%20unlocks%20at%2000%3A00%20Israel%20time.%20Here%20we%20go%20again.">Add to calendar</a>
     </div>
   </div>
@@ -150,9 +169,6 @@ main,.scene-tag{transition:opacity .8s ease}
 <div class="crew" id="crew" hidden role="dialog" aria-modal="true" aria-labelledby="crewTitle">
   <div class="crew-card">
     <div class="crew-head"><h2 id="crewTitle">Launch night crew</h2><button id="crewClose" type="button" aria-label="Close">✕</button></div>
-    <p class="crew-sub">Drop your PSN username. Everyone who opens this page sees the full list.</p>
-    <form id="crewForm" novalidate><input id="psn" maxlength="16" autocomplete="off" spellcheck="false" placeholder="PSN username" aria-label="PSN username"><button type="submit" id="crewJoin">I'm in</button></form>
-    <p class="crew-msg" id="crewMsg" role="status"></p>
     <ol class="crew-list" id="crewList"></ol>
   </div>
 </div>
@@ -415,6 +431,10 @@ function crewMsg(t){$('crewMsg').textContent=t}
 function renderCrew(){
   const list=$('crewList');list.textContent='';
   $('crewCount').textContent=crew.docs.length?'· '+crew.docs.length:'';
+  const chips=$('crewChips');chips.textContent='';const SHOW=4;
+  if(!crew.docs.length){const li=document.createElement('li');li.className='empty';li.textContent='Nobody yet. Be the first.';chips.append(li)}
+  [...crew.docs.filter(d=>d.id===crew.me),...crew.docs.filter(d=>d.id!==crew.me)].slice(0,SHOW).forEach(d=>{const li=document.createElement('li');li.textContent=String(d.psn||'');if(d.id===crew.me)li.className='me';chips.append(li)});
+  if(crew.docs.length>SHOW){const li=document.createElement('li');li.style.padding='0';li.style.background='transparent';const b=document.createElement('button');b.type='button';b.textContent='+'+(crew.docs.length-SHOW)+' more';b.addEventListener('click',openCrew);li.append(b);chips.append(li)}
   if(!crew.docs.length){const li=document.createElement('li');li.className='empty';li.textContent='Nobody yet. Be the first.';list.append(li)}
   crew.docs.forEach(d=>{
     const mine=d.id===crew.me,li=document.createElement('li');
@@ -459,13 +479,12 @@ $('crewForm').addEventListener('submit',async e=>{
   }catch(err){crewMsg('Could not save your username. Try again in a minute.')}
   finally{$('crewJoin').disabled=false}
 });
-function openCrew(){$('crew').hidden=false;startCrew();refreshCrew();watchCrew(true);setTimeout(()=>$('psn').focus(),50)}
-function closeCrew(){$('crew').hidden=true;watchCrew(false);$('crewBtn').focus()}
-$('crewBtn').addEventListener('click',openCrew);
+function openCrew(){$('crew').hidden=false;refreshCrew();setTimeout(()=>$('crewClose').focus(),50)}
+function closeCrew(){$('crew').hidden=true}
 $('crewClose').addEventListener('click',closeCrew);
 $('crew').addEventListener('click',e=>{if(e.target===$('crew'))closeCrew()});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('crew').hidden)closeCrew()});
-startCrew();
+startCrew();watchCrew(true);
 
 /* ---------- scene helpers ---------- */
 const cv=document.getElementById('scene'),cx=cv.getContext('2d');
